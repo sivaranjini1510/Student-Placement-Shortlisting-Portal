@@ -1,0 +1,11 @@
+.sidebar {
+  @apply w-64 bg-gray-800 text-white p-4;
+}
+
+navItem {
+  @apply text-white hover:text-blue-300;
+}
+
+main {
+  @apply flex-1 p-6 bg-gray-50;
+}

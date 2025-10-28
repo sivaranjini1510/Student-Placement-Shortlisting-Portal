@@ -1,0 +1,19 @@
+.container {
+  @apply min-h-screen flex items-center justify-center bg-gray-100;
+}
+
+.card {
+  @apply bg-white p-6 rounded shadow-md w-full max-w-md;
+}
+
+title {
+  @apply text-xl font-semibold mb-4 text-center;
+}
+
+input {
+  @apply border p-2 w-full mb-4;
+}
+
+button {
+  @apply bg-blue-600 text-white px-4 py-2 w-full rounded;
+}

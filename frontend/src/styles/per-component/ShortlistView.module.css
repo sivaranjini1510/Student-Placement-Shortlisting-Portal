@@ -1,0 +1,15 @@
+.table {
+  @apply w-full table-auto border;
+}
+
+thead {
+  @apply bg-gray-100;
+}
+
+td {
+  @apply border px-4 py-2;
+}
+
+emptyRow {
+  @apply text-center py-4;
+}

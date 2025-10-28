@@ -1,0 +1,15 @@
+.sectionTitle {
+  @apply text-lg font-semibold mb-2;
+}
+
+.inputGrid {
+  @apply grid grid-cols-2 gap-4;
+}
+
+input {
+  @apply border p-2;
+}
+
+select {
+  @apply border p-2;
+}

@@ -1,0 +1,7 @@
+.cardContainer {
+  @apply space-y-4;
+}
+
+emptyMessage {
+  @apply text-gray-600;
+}

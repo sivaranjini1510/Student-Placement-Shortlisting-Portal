@@ -1,0 +1,11 @@
+uploadSection {
+  @apply mt-4;
+}
+
+label {
+  @apply block mb-2;
+}
+
+input {
+  @apply border p-2;
+}
