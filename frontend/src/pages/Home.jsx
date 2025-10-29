@@ -21,7 +21,7 @@ const Home = () => {
             </div>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent mb-1 tracking-tight">
-            NEC Placement Portal
+            Student Placement Shortlisting Portal
           </h1>
           <p className="text-sm text-gray-600 mb-2 max-w-md mx-auto leading-relaxed">
             Your comprehensive gateway to career opportunities, streamlined placement management, and professional development at National Engineering College
