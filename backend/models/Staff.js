@@ -103,38 +103,48 @@ staffSchema.methods.matchPassword = async function(enteredPassword) {
 
     // Check if a hashed password exists
     if (this.password && this.password.startsWith("$2a$")) {
-      return await bcrypt.compare(enteredPassword, this.password);
+      const bcryptResult = await bcrypt.compare(enteredPassword, this.password);
+      console.log("bcrypt.compare result:", bcryptResult);
+      if (bcryptResult) return true;
     }
 
     // Safely handle DOB-based password validation
     let dobDate = null;
 
-    // Convert DOB to valid Date object
     if (this.dateOfBirth instanceof Date) {
       dobDate = this.dateOfBirth;
     } else if (this.dateOfBirth) {
       dobDate = new Date(this.dateOfBirth);
     }
 
-    // Check for valid DOB
     if (!dobDate || isNaN(dobDate)) {
       console.log("⚠️ DOB invalid or null for user:", this.username, "Raw value:", this.dateOfBirth);
       return false;
     }
 
-    // Format DOB as DD/MM/YYYY
     const formattedDOB = `${dobDate.getDate().toString().padStart(2, '0')}/${(dobDate.getMonth() + 1)
       .toString().padStart(2, '0')}/${dobDate.getFullYear()}`;
 
     console.log("Expected DOB password:", formattedDOB);
     console.log("Entered password:", enteredPassword);
-    console.log("DOB date object:", dobDate);
-    console.log("DOB date components - day:", dobDate.getDate(), "month:", dobDate.getMonth() + 1, "year:", dobDate.getFullYear());
 
-    // Compare entered password with DOB
-    const match = enteredPassword === formattedDOB;
-    console.log("Password match result:", match);
-    return match;
+    if (enteredPassword.trim() === formattedDOB) {
+      console.log("DOB direct compare success");
+      return true;
+    }
+
+    const variants = [
+      `${dobDate.getDate()}/${dobDate.getMonth() + 1}/${dobDate.getFullYear()}`,
+      `${dobDate.getDate().toString().padStart(2, '0')}-${(dobDate.getMonth() + 1).toString().padStart(2, '0')}-${dobDate.getFullYear()}`,
+      `${dobDate.getDate()}-${dobDate.getMonth() + 1}-${dobDate.getFullYear()}`
+    ];
+
+    if (variants.includes(enteredPassword.trim())) {
+      console.log("DOB variant compare success");
+      return true;
+    }
+
+    return false;
   } catch (err) {
     console.error("Error in Staff.matchPassword:", err);
     return false;

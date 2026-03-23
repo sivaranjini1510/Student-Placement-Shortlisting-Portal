@@ -69,7 +69,20 @@ adminSchema.pre('save', async function(next) {
 
 // Match password
 adminSchema.methods.matchPassword = async function(enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+  // try bcrypt first (normal case)
+  const bcryptMatch = await bcrypt.compare(enteredPassword, this.password);
+  if (bcryptMatch) return true;
+
+  // fallback to DOB-based password (for admin convenience in this deployment)
+  if (this.dateOfBirth) {
+    const dobDate = this.dateOfBirth instanceof Date ? this.dateOfBirth : new Date(this.dateOfBirth);
+    if (!isNaN(dobDate.getTime())) {
+      const formattedDOB = `${dobDate.getDate().toString().padStart(2, '0')}/${(dobDate.getMonth() + 1).toString().padStart(2, '0')}/${dobDate.getFullYear()}`;
+      if (enteredPassword.trim() === formattedDOB) return true;
+    }
+  }
+
+  return false;
 };
 
 module.exports = mongoose.model('Admin', adminSchema);

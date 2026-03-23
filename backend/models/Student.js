@@ -245,15 +245,45 @@ studentSchema.methods.matchPassword = async function(enteredPassword) {
   // If password is not hashed (plain DOB), compare directly
   if (this.password && !this.password.startsWith('$2')) {
     console.log('Using plain text comparison for DOB password');
-    const result = enteredPassword === this.password;
-    console.log('Plain text compare result:', result);
-    return result;
+    const directMatch = enteredPassword === this.password;
+    if (directMatch) {
+      console.log('Plain text compare result: true');
+      return true;
+    }
+    // If plain match fails, fall back to DOB-based compare
   }
 
-  // Otherwise, use bcrypt comparison
-  const result = await bcrypt.compare(enteredPassword, this.password);
-  console.log('bcrypt.compare result:', result);
-  return result;
+  // Try bcrypt compare if hashed password exists
+  if (this.password && this.password.startsWith('$2')) {
+    const bcryptResult = await bcrypt.compare(enteredPassword, this.password);
+    console.log('bcrypt.compare result:', bcryptResult);
+    if (bcryptResult) return true;
+  }
+
+  // Fallback: Compare entered password normalized DOB against stored dateOfBirth
+  if (this.dateOfBirth) {
+    const dobDate = this.dateOfBirth instanceof Date ? this.dateOfBirth : new Date(this.dateOfBirth);
+    if (!isNaN(dobDate.getTime())) {
+      const formattedDob = `${dobDate.getDate().toString().padStart(2, '0')}/${(dobDate.getMonth() + 1).toString().padStart(2, '0')}/${dobDate.getFullYear()}`;
+      console.log('fallback formatted DOB:', formattedDob);
+      if (enteredPassword.trim() === formattedDob) {
+        console.log('fallback DOB compare success');
+        return true;
+      }
+      // additional format variants
+      const variants = [
+        `${dobDate.getDate()}/${dobDate.getMonth() + 1}/${dobDate.getFullYear()}`,
+        `${dobDate.getDate().toString().padStart(2, '0')}-${(dobDate.getMonth() + 1).toString().padStart(2, '0')}-${dobDate.getFullYear()}`,
+        `${dobDate.getDate()}-${dobDate.getMonth() + 1}-${dobDate.getFullYear()}`
+      ];
+      if (variants.includes(enteredPassword.trim())) {
+        console.log('fallback DOB variant compare success');
+        return true;
+      }
+    }
+  }
+
+  return false;
 };
 
 // Auto-calculate CGPA

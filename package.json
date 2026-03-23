@@ -1,4 +1,13 @@
 {
+  "name": "student-placement-shortlisting-portal",
+  "version": "1.0.0",
+  "description": "Student Placement Shortlisting Portal",
+  "scripts": {
+    "frontend": "cd frontend && npm run dev",
+    "backend": "cd backend && node server.js",
+    "dev": "npm run frontend",
+    "install:all": "cd frontend && npm install && cd ../backend && npm install"
+  },
   "dependencies": {
     "archiver": "^7.0.1",
     "axios": "^1.12.2",

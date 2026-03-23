@@ -103,7 +103,7 @@ const validateStudentData = (data) => {
       // Try parsing as DD/MM/YYYY first (as per user CSV format), then other formats
       let parsedDate = moment(dateStr, 'DD/MM/YYYY', true);
       if (!parsedDate.isValid()) {
-        parsedDate = moment(dateStr, ['MM/DD/YYYY', 'YYYY-MM-DD', 'MM-DD-YYYY'], true);
+        parsedDate = moment(dateStr, ['MM/DD/YYYY', 'YYYY-MM-DD', 'MM-DD-YYYY', 'DD-MM-YYYY'], true);
       }
       if (parsedDate.isValid()) {
         // Create date object at midnight local time to avoid timezone issues

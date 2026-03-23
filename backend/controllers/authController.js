@@ -81,46 +81,20 @@ exports.login = async (req, res) => {
     console.log('Password validation context:', {
       storedPassword: user.password,
       storedPasswordLength: user.password ? user.password.length : 0,
-      isStoredHashBcrypt: user.password ? user.password.startsWith('$2') : false,
-      isStoredDOBFormat: user.password ? /^\d{2}\/\d{2}\/\d{4}$/.test(user.password) : false,
-      enteredPasswordFormat: password.includes('/') ? 'DOB' : 'regular',
       userHasDateOfBirth: !!user.dateOfBirth
     });
 
-    // For students and staff, use DOB-based password validation if dateOfBirth is available
-    // For admin, use bcrypt compare
     let passwordMatch = false;
-    if ((role === 'student' || role === 'staff') && user.dateOfBirth) {
-      console.log('Using DOB-based password validation');
-      const expectedDOB = formatDOB(user.dateOfBirth);
-      console.log('Expected DOB password:', expectedDOB);
-      console.log('Entered password:', trimmedPassword);
-      console.log('DOB raw value:', user.dateOfBirth);
-      console.log('DOB type:', typeof user.dateOfBirth);
-
-      // Safely get date components
-      let dobDate = null;
-      if (user.dateOfBirth instanceof Date) {
-        dobDate = user.dateOfBirth;
-      } else if (typeof user.dateOfBirth === 'string') {
-        dobDate = new Date(user.dateOfBirth);
-      }
-
-      if (dobDate && !isNaN(dobDate.getTime())) {
-        console.log('DOB date components - day:', dobDate.getDate(), 'month:', dobDate.getMonth() + 1, 'year:', dobDate.getFullYear());
-      } else {
-        console.log('DOB is not a valid Date object');
-      }
-
-      passwordMatch = (trimmedPassword === expectedDOB);
-      console.log('Password match result:', passwordMatch);
+    if (user.matchPassword && typeof user.matchPassword === 'function') {
+      // Use model-specific password matcher (handles bcrypt + DOB fallback)
+      passwordMatch = await user.matchPassword(trimmedPassword);
+      console.log('Used model.matchPassword result:', passwordMatch);
     } else {
-      // For admin users, use bcrypt compare
-      console.log('Using standard bcrypt validation');
+      // Fallback to bcrypt compare if user model lacks method
+      console.log('Using fallback bcrypt compare');
       passwordMatch = await bcrypt.compare(trimmedPassword, user.password);
+      console.log('Fallback bcrypt result:', passwordMatch);
     }
-
-    console.log('Password match result:', passwordMatch);
 
     if (!passwordMatch) {
       return res.status(401).json({

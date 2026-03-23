@@ -21,7 +21,7 @@ connectDB();
 
 // CORS (moved to top to apply to all responses, including errors)
 app.use(cors({
-  origin: 'https://student-placement-shortlisting-portal-zgg7.onrender.com',
+  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5176'],
   credentials: true
 }));
 
